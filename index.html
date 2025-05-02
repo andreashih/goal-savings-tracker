@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>儲蓄目標追蹤器</title>
+  <style>
+    body { font-family: sans-serif; background: #f9f9f9; padding: 2em; }
+    .container { max-width: 600px; margin: auto; background: white; padding: 2em; border-radius: 1em; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    input { width: 100%; padding: 0.5em; margin-top: 0.3em; margin-bottom: 1em; border: 1px solid #ccc; border-radius: 0.5em; }
+    .progress { background: #eee; border-radius: 5px; overflow: hidden; height: 20px; margin-top: 0.5em; }
+    .progress-bar { height: 100%; background: #4ade80; text-align: right; padding-right: 5px; color: white; font-size: 0.8em; line-height: 20px; }
+    .success { color: green; font-weight: bold; }
+    .warning { color: red; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎯 儲蓄目標追蹤器</h1>
+    <label>目標名稱<input id="goalName" type="text" value="冰島旅費"></label>
+    <label>每月收入<input id="income" type="number" value="45000"></label>
+    <label>固定支出<input id="fixed" type="number" value="15000"></label>
+    <label>生活支出<input id="living" type="number" value="8000"></label>
+    <label>娛樂支出<input id="fun" type="number" value="5000"></label>
+    <label>目前已存金額<input id="saved" type="number" value="30000"></label>
+    <label>目標金額<input id="goal" type="number" value="120000"></label>
+    <label>預計幾個月後達成<input id="months" type="number" value="12"></label>
+
+    <button onclick="calculate()">計算儲蓄狀況</button>
+
+    <div id="result" style="margin-top: 2em;"></div>
+  </div>
+
+  <script>
+    function format(num) {
+      return num.toLocaleString('zh-TW');
+    }
+
+    function calculate() {
+      const goalName = document.getElementById('goalName').value;
+      const income = +document.getElementById('income').value;
+      const fixed = +document.getElementById('fixed').value;
+      const living = +document.getElementById('living').value;
+      const fun = +document.getElementById('fun').value;
+      const goal = +document.getElementById('goal').value;
+      const saved = +document.getElementById('saved').value;
+      const months = +document.getElementById('months').value;
+
+      const totalExpense = fixed + living + fun;
+      const savingPerMonth = income - totalExpense;
+      const newTotal = saved + savingPerMonth * months;
+      const percentDone = Math.min((saved / goal) * 100, 100);
+      const percentAfter = Math.min((newTotal / goal) * 100, 100);
+      const shortfall = goal - newTotal;
+      const success = newTotal >= goal;
+
+      const bar = `<div class='progress'><div class='progress-bar' style='width: ${percentDone}%;'>${percentDone.toFixed(1)}%</div></div>`;
+
+      document.getElementById('result').innerHTML = `
+        <h2>📊 儲蓄報告：${goalName}</h2>
+        <p>每月可存金額：<strong>${format(savingPerMonth)}</strong> 元</p>
+        <p>月儲蓄率：約 <strong>${((savingPerMonth / income) * 100).toFixed(1)}%</strong></p>
+        <p>目前進度：<strong>${format(saved)} / ${format(goal)} 元</strong></p>
+        ${bar}
+        <p style="margin-top:1em">預計 ${months} 個月後總存款：<strong>${format(newTotal)}</strong> 元（${percentAfter.toFixed(1)}%）</p>
+        <p class="${success ? 'success' : 'warning'}">
+          ${success ? `✅ 太好了！你會成功達成「${goalName}」的目標！` : `⚠️ 還差 ${format(shortfall)} 元，可能需要調整儲蓄策略`}
+        </p>
+      `;
+    }
+  </script>
+</body>
+</html>
